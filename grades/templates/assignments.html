@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    {% include 'header.html' with title='Assignments' %}
+    <main class="pageColumn">
+        <h1>All assignments</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Assignment</th>
+                    <th class="sortable">Due date</th>
+                    <th class="numcolumn sortable">Weight</th>
+                </tr>
+            </thead>
+            <script type="module">
+                import { make_table_sortable } from "/static/main.js";
+                $('.sortable').on("click", function() {
+                    let tbody = $(this).parent().parent().siblings("tbody");
+                    make_table_sortable($(this), $(tbody));
+                });
+            </script>
+            <tbody>
+                {% for assignment in assignments %}
+                    <tr id="tr{{forloop.counter}}">
+                        <td>
+                            <a href=/{{assignment.id}} title="Navigates to the assignment page">{{assignment.title}}</a>
+                        </td>
+                        <td>{{assignment.deadline|date:'M d'}}</td>
+                        <td class="numcolumn">{{assignment.weight}}</td>
+                    </tr>
+                    <script type="module">
+                        $('#tr{{forloop.counter}}').attr('data-index', '{{forloop.counter}}');
+                        $('#tr{{forloop.counter}}').attr('data-value', "{{assignment.deadline|date:'U'}}");
+                    </script>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    {% include 'header.html' with title='Submissions' %}
+    <main class="pageColumn">
+        <h1>{{assignment.title}}</h1>
+        <p class="bottomEdgeP">All grades out of {{assignment.points}}</p>
+        <form action="/{{assignment.id}}/grade/" method="post">{% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Submission</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                {% for submission in submissions %}
+                <tr>
+                    <td>{{submission.author}}</td>
+                    <td>
+                        <a href="/uploads/{{submission.file.name}}/" title="{{submission.assignment}} submission for student {{submission.author}}">Submission</a>
+                    </td>
+                    <td>
+                        <input type="number" name="grade-{{submission.id}}" title="HW1 grade points for student s1, out of 100" value={{submission.score}}></input>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <button type="submit" title="Submits grading for HW1">Submit</button>
+            <a href="/{{assignment.id}}/" role="button">Back to Assignmment</a>
+        </form>
+    </main>
+</html>

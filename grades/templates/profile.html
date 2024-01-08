@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    {% include 'header.html' with title='Profile' %}
+    <main class="pageColumn">
+        <h1>Your grades</h1>
+        <div class="action-card">
+            <form action="/profile/logout/" method="post">{% csrf_token %}
+                <div class="cardline">
+                    <p class="noEdgeP">Currently logged in as {{user.username}}.</p>
+                    <button type="submit" class="rightlink" title="Logs out user and navigates to the LogIn Page">Log out</a>
+                </div>
+            </form>
+        </div>
+        <table>
+            {% if userType|divisibleby:2 %}
+            <thead>
+                <tr>
+                    <th>Assignment</th>
+                    <th class="numcolumn">Graded</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                <tr id="#tr{{forloop.counter}}">
+                    <td>
+                        <a href=/{{assignment.id}} title="Navigates to the HW description page">{{assignment.title}}</a>
+                    </td>
+                    <td class="numcolumn">{{assignment.id|gradedSubmissions:user}}</td>
+                </tr>
+                <script type="module">
+                    $('#tr{{forloop.counter}}').attr('data-index', '{{forloop.counter}}');
+                </script>
+                {% endfor %}
+                {% else %}
+                <script type="module">
+                    import { make_grade_hypothesized } from "/static/main.js";
+                    make_grade_hypothesized($("table"));
+                </script>
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th class="numcolumn sortable">Score</th>
+                    </tr>
+                </thead>
+                <script type="module">
+                    import { make_table_sortable } from "/static/main.js";
+                    $('.sortable').on("click", function() {
+                        let tbody = ($(this).parent().parent().siblings("tbody"));
+                        make_table_sortable($(this), tbody);
+                    });
+                </script>
+                {% for assignment in assignments %}
+                <tr id="tr{{forloop.counter}}">
+                    <td>
+                        <a href=/{{assignment.id}} title="Navigates to the HW description page">{{assignment.title}}</a>
+                    </td>
+                    <td id="grade{{forloop.counter}}" class="numcolumn">{{assignment.id|gradeAssignment:user}}</td>
+                </tr>
+                <script type="module">
+                    $('#tr{{forloop.counter}}').attr('data-index', '{{forloop.counter}}');
+                    $('#grade{{forloop.counter}}').attr('data-weight', '{{assignment.weight}}');
+                </script>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Final grade</th>
+                    <th class="numcolumn">{{assignments|calculateGrade:user}}</th>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </main>
+</html>

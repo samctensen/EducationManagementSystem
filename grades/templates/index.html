@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    {% include 'header.html' with title=assignment.title %}
+    <main class="pageColumn">
+        <h1>{{assignment.title}}</h1>
+        <p class="bottomEdgeP">Due {{assignment.deadline|date:'F d'}}, total of {{assignment.points}} point{{assignment.points|pluralize}}</p>
+        <div class="action-card">
+            {% if userType|divisibleby:2 %}
+            <p class="bottomEdgeP">Currently {{totalSubmissions}}/{{totalStudents}} submission{{totalStudents|pluralize}}</p>
+            <div class="cardline">
+                <p class="noEdgeP">{{yourSubmissions}} submission{{yourSubmissions|pluralize}} assigned to you</p>
+                <a href=/{{assignment.id}}/submissions/ title="Navigates to the Submission page for the assignment to be graded" class=rightlink>Grade</a>
+            </div>
+            {% else %}
+                {{assignment.id|studentSubmission:user | safe}}
+            {% endif %}
+            {% if isNotDue %}
+            <form action="/{{assignment.id}}/submit/"  method="post" enctype="multipart/form-data" id="submitForm">{% csrf_token %}
+                <input type="file" name="submission" id="fileSubmission">
+                <button type="submit" title="Submits HW" class="rightButton" id="submitButton">Submit</button>
+            </form>
+            <script type="module">
+                import { make_form_async } from "/static/main.js";
+                $("#submitForm").on("submit", function(event) {
+                    event.preventDefault();
+                    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    console.log(csrftoken);
+                    make_form_async($(this), csrftoken);
+                });
+            </script>
+            {% endif %}
+        </div>
+        <strong class="desc">Description</strong>
+        <br>
+        {{assignment.description | safe}}
+    </main>
+</html>
